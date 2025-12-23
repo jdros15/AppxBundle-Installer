@@ -90,60 +90,97 @@
         </StackPanel>
         
         <!-- Package List -->
-        <ListView x:Name="PackageList"
-                  Grid.Row="2"
-                  SelectionChanged="PackageList_SelectionChanged"
-                  Background="Transparent"
-                  BorderThickness="0">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Margin="0,8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="44" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="150" />
-                            <ColumnDefinition Width="60" />
-                        </Grid.ColumnDefinitions>
-                        
-                        <!-- Icon -->
-                        <Border Grid.Column="0" 
-                                Width="36" Height="36"
-                                Background="{DynamicResource SystemControlHighlightAccentBrush}"
-                                CornerRadius="6">
-                            <TextBlock Text="📦" FontSize="18" 
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        
-                        <!-- Name & Publisher -->
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,16,0">
-                            <TextBlock Text="{Binding DisplayName}" 
-                                       FontWeight="SemiBold"
-                                       TextTrimming="CharacterEllipsis"
-                                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
-                            <TextBlock Text="{Binding PublisherDisplayName}" 
-                                       FontSize="12"
-                                       TextTrimming="CharacterEllipsis"
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <!-- Column Headers - Add right margin to account for scrollbar -->
+            <Grid Grid.Row="0" Margin="12,0,28,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="44" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="140" />
+                    <ColumnDefinition Width="70" />
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="1" Text="Name" 
+                           FontWeight="SemiBold" FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           Margin="8,0,0,0" />
+                <TextBlock Grid.Column="2" Text="Version" 
+                           FontWeight="SemiBold" FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           HorizontalAlignment="Center" />
+                <TextBlock Grid.Column="3" Text="Arch" 
+                           FontWeight="SemiBold" FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           HorizontalAlignment="Center" />
+            </Grid>
+            
+            <ListView x:Name="PackageList"
+                      Grid.Row="1"
+                      SelectionChanged="PackageList_SelectionChanged"
+                      Background="Transparent"
+                      BorderThickness="0"
+                      HorizontalContentAlignment="Stretch"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="12,0" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="44" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="140" />
+                                <ColumnDefinition Width="70" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Icon -->
+                            <Border Grid.Column="0" 
+                                    Width="36" Height="36"
+                                    Background="{DynamicResource SystemControlHighlightAccentBrush}"
+                                    CornerRadius="6">
+                                <TextBlock Text="📦" FontSize="18" 
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            
+                            <!-- Name & Publisher -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,16,0">
+                                <TextBlock Text="{Binding DisplayName}" 
+                                           FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                <TextBlock Text="{Binding PublisherDisplayName}" 
+                                           FontSize="12"
+                                           TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                            </StackPanel>
+                            
+                            <!-- Version -->
+                            <TextBlock Grid.Column="2" 
+                                       Text="{Binding Version}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
                                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-                        </StackPanel>
-                        
-                        <!-- Version -->
-                        <TextBlock Grid.Column="2" 
-                                   Text="{Binding Version}"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Left"
-                                   Margin="0,0,16,0"
-                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-                        
-                        <!-- Arch -->
-                        <TextBlock Grid.Column="3"
-                                   Text="{Binding Architecture}"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Left"
-                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                            
+                            <!-- Arch -->
+                            <TextBlock Grid.Column="3"
+                                       Text="{Binding Architecture}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
         
         <!-- Selected Package Actions -->
         <Border x:Name="ActionPanel" 
@@ -174,9 +211,61 @@
             </Grid>
         </Border>
         
-        <!-- Status -->
-        <TextBlock x:Name="StatusText" Grid.Row="3" 
-                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                   Margin="0,8,0,0" />
+        <!-- Status and Info -->
+        <Grid Grid.Row="3" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock x:Name="StatusText" 
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            
+            <!-- Info Button -->
+            <Button Grid.Column="1" 
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="8,4"
+                    ToolTipService.InitialShowDelay="0"
+                    ToolTipService.ShowDuration="30000">
+                <Button.ToolTip>
+                    <ToolTip MaxWidth="350">
+                        <StackPanel>
+                            <TextBlock Text="Architecture Types" FontWeight="Bold" Margin="0,0,0,8" />
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                <Run FontWeight="SemiBold">X64:</Run>
+                                <Run>64-bit Intel/AMD processors</Run>
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                <Run FontWeight="SemiBold">X86:</Run>
+                                <Run>32-bit Intel/AMD processors</Run>
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                <Run FontWeight="SemiBold">ARM64:</Run>
+                                <Run>64-bit ARM processors (e.g., Snapdragon)</Run>
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                <Run FontWeight="SemiBold">ARM:</Run>
+                                <Run>32-bit ARM processors</Run>
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                <Run FontWeight="SemiBold">Neutral:</Run>
+                                <Run>Architecture-independent (works on all)</Run>
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap">
+                                <Run FontWeight="SemiBold">Any:</Run>
+                                <Run>Can run on any architecture (universal)</Run>
+                            </TextBlock>
+                        </StackPanel>
+                    </ToolTip>
+                </Button.ToolTip>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="ℹ️" FontSize="14" />
+                    <TextBlock Text="Arch Info" FontSize="12" Margin="4,0,0,0"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </Grid>
     </Grid>
 </UserControl>
