@@ -1,0 +1,92 @@
+<UserControl x:Class="AppxBundleInstaller.Views.DiagnosticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             Loaded="OnLoaded">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Text="Diagnostics" Style="{StaticResource SectionHeaderStyle}" Margin="0" />
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Export Log" Click="ExportLog_Click" Padding="16,8" Margin="0,0,8,0" />
+                <Button Content="Clear" Click="ClearLog_Click" Padding="16,8" />
+            </StackPanel>
+        </Grid>
+        
+        <!-- Log List -->
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+            <ListView x:Name="LogListView"
+                      Background="Transparent"
+                      BorderThickness="0">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70" />
+                                <ColumnDefinition Width="28" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0" 
+                                       Text="{Binding TimestampFormatted}"
+                                       FontFamily="Consolas"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                            
+                            <TextBlock Grid.Column="1" Text="{Binding LevelIcon}" FontSize="14" />
+                            
+                            <TextBlock Grid.Column="2" 
+                                       Text="{Binding Message}" 
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+        
+        <!-- System Info -->
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,16,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Windows Version" FontSize="12"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                    <TextBlock x:Name="WindowsVersionText" FontWeight="SemiBold" Margin="0,4,0,0"
+                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Sideloading" FontSize="12"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                    <TextBlock x:Name="SideloadingStatusText" FontWeight="SemiBold" Margin="0,4,0,0" />
+                </StackPanel>
+                
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Elevation" FontSize="12"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                    <TextBlock x:Name="ElevationStatusText" FontWeight="SemiBold" Margin="0,4,0,0"
+                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

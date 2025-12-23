@@ -1,0 +1,72 @@
+<UserControl x:Class="AppxBundleInstaller.Views.DragDropView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.modernwpf.com/2019">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <TextBlock Grid.Row="0" 
+                   Text="Install Package" 
+                   Style="{StaticResource SectionHeaderStyle}" />
+        
+        <!-- Drop Zone -->
+        <Border x:Name="DropZone"
+                Grid.Row="1"
+                AllowDrop="True"
+                DragEnter="DropZone_DragEnter"
+                DragLeave="DropZone_DragLeave"
+                DragOver="DropZone_DragOver"
+                Drop="DropZone_Drop"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="2"
+                CornerRadius="12"
+                MinHeight="300">
+            
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40">
+                <TextBlock Text="📦" FontSize="64" HorizontalAlignment="Center" />
+                
+                <TextBlock Text="Drag and drop a package file here"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                           Margin="0,24,0,8" />
+                
+                <TextBlock Text="Supports .appx, .appxbundle, .msix, .msixbundle"
+                           FontSize="13"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,24" />
+                
+                <Button x:Name="BrowseButton"
+                        Content="Browse for file..."
+                        Click="BrowseButton_Click"
+                        HorizontalAlignment="Center"
+                        Padding="24,10"
+                        FontSize="14" />
+            </StackPanel>
+        </Border>
+        
+        <!-- Status Panel (shown when file is being processed) -->
+        <Border x:Name="StatusPanel"
+                Grid.Row="1"
+                Visibility="Collapsed"
+                Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <TextBlock x:Name="StatusText" 
+                           Text="Processing..."
+                           FontSize="16"
+                           FontWeight="SemiBold" />
+                <ProgressBar x:Name="ProgressBar"
+                             IsIndeterminate="True"
+                             Margin="0,12,0,0" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,125 @@
+<Window x:Class="AppxBundleInstaller.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:local="clr-namespace:AppxBundleInstaller"
+        xmlns:views="clr-namespace:AppxBundleInstaller.Views"
+        xmlns:vm="clr-namespace:AppxBundleInstaller.ViewModels"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="AppxBundle Installer" 
+        Height="720" Width="1100"
+        MinHeight="600" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+    
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <!-- Navigation Panel -->
+        <Border Grid.Column="0" 
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <!-- App Title -->
+                <StackPanel Grid.Row="0" Margin="20,28,20,20">
+                    <TextBlock Text="AppxBundle Installer" 
+                               FontSize="18" 
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                    <TextBlock Text="Package Manager" 
+                               FontSize="12"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" 
+                               Margin="0,4,0,0" />
+                </StackPanel>
+                
+                <!-- Navigation Items -->
+                <StackPanel Grid.Row="1" Margin="12,0">
+                    <RadioButton x:Name="NavInstall"
+                                 GroupName="Navigation"
+                                 IsChecked="True"
+                                 Style="{StaticResource NavRadioButtonStyle}"
+                                 Margin="0,2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📦" FontSize="16" Width="24" />
+                            <TextBlock Text="Install Package" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </RadioButton>
+                    
+                    <RadioButton x:Name="NavInstalled"
+                                 GroupName="Navigation"
+                                 Style="{StaticResource NavRadioButtonStyle}"
+                                 Margin="0,2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📋" FontSize="16" Width="24" />
+                            <TextBlock Text="Installed Apps" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </RadioButton>
+                    
+                    <RadioButton x:Name="NavDiagnostics"
+                                 GroupName="Navigation"
+                                 Style="{StaticResource NavRadioButtonStyle}"
+                                 Margin="0,2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🔍" FontSize="16" Width="24" />
+                            <TextBlock Text="Diagnostics" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </RadioButton>
+                </StackPanel>
+                
+                <!-- Settings at bottom -->
+                <StackPanel Grid.Row="2" Margin="12,0,12,20">
+                    <Rectangle Height="1" Fill="{DynamicResource SystemControlForegroundBaseLowBrush}" Margin="8,0,8,12" />
+                    
+                    <!-- Theme Toggle -->
+                    <Grid Margin="8,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Dark Mode" VerticalAlignment="Center" 
+                                   Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                        <CheckBox Grid.Column="1" 
+                                  IsChecked="{Binding IsDarkMode, Mode=TwoWay}" 
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                    
+                    <!-- Version -->
+                    <TextBlock Text="Version 1.0.0" 
+                               FontSize="11"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,12,0,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Content Area -->
+        <Border Grid.Column="1" Padding="24">
+            <Grid>
+                <!-- Install Package View -->
+                <views:DragDropView x:Name="InstallView" 
+                                    Visibility="{Binding IsChecked, ElementName=NavInstall, Converter={StaticResource BoolToVisibilityConverter}}" />
+                
+                <!-- Installed Apps View -->
+                <views:PackageListView x:Name="InstalledView"
+                                       Visibility="{Binding IsChecked, ElementName=NavInstalled, Converter={StaticResource BoolToVisibilityConverter}}" />
+                
+                <!-- Diagnostics View -->
+                <views:DiagnosticsView x:Name="DiagnosticsViewCtrl"
+                                       Visibility="{Binding IsChecked, ElementName=NavDiagnostics, Converter={StaticResource BoolToVisibilityConverter}}" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
