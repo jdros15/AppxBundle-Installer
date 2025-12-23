@@ -145,7 +145,7 @@
                                            FontSize="16"
                                            FontWeight="SemiBold"
                                            Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
-                                <TextBlock Text="Version 1.0.0" 
+                                <TextBlock Text="Version 1.0.1" 
                                            FontSize="12"
                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                            Margin="0,2,0,0" />

@@ -1,0 +1,112 @@
+<UserControl x:Class="AppxBundleInstaller.Views.StoreView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             xmlns:vm="clr-namespace:AppxBundleInstaller.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="800">
+
+    <UserControl.DataContext>
+        <vm:StoreViewModel />
+    </UserControl.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="Package Downloader" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,24" />
+
+        <!-- Search Area -->
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+            <StackPanel>
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Type Selector -->
+                    <ComboBox ItemsSource="{Binding SearchTypes}" 
+                              SelectedItem="{Binding SelectedType}"
+                              Width="120"
+                              Margin="0,0,8,0"
+                              ui:ControlHelper.CornerRadius="4" />
+
+                    <!-- Input URL -->
+                    <TextBox Grid.Column="1" 
+                             Text="{Binding SearchUrl, UpdateSourceTrigger=PropertyChanged}"
+                             ui:ControlHelper.PlaceholderText="Paste URL, Product ID, or Package Family Name..."
+                             ui:ControlHelper.CornerRadius="4">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
+
+                    <!-- Ring Selector -->
+                    <ComboBox Grid.Column="2" 
+                              ItemsSource="{Binding Rings}"
+                              SelectedItem="{Binding SelectedRing}"
+                              Width="100"
+                              Margin="8,0,0,0"
+                              ui:ControlHelper.CornerRadius="4" />
+                </Grid>
+
+                <Button Command="{Binding SearchCommand}" 
+                        Content="Search" 
+                        HorizontalAlignment="Right"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Width="100" />
+                
+                <!-- Status Message -->
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <ui:ProgressRing IsActive="{Binding IsLoading}" 
+                                     Width="16" Height="16" 
+                                     Margin="0,0,8,0" 
+                                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <TextBlock Text="{Binding StatusMessage}" 
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Results List -->
+        <ListView Grid.Row="2" 
+                  ItemsSource="{Binding StoreItems}" 
+                  SelectionMode="Single"
+                  BorderThickness="1"
+                  BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="300">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Size" Width="100" DisplayMemberBinding="{Binding FileSize}" />
+                    <GridViewColumn Header="Expiration" Width="150" DisplayMemberBinding="{Binding Expiration}" />
+                    <GridViewColumn Header="Action" Width="120">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Download" 
+                                        Command="{Binding DataContext.DownloadCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource DefaultButtonStyle}"
+                                        Padding="8,4" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>

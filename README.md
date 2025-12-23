@@ -41,6 +41,11 @@ A lightweight, modern Windows desktop application for managing Appx, AppxBundle,
 - **Diagnostics**: Comprehensive logging system for troubleshooting installation failures.
 - **Privacy Focused**: No telemetry, no ads, no background services.
 
+### ☁️ Package Downloader
+- **Direct Store Access**: Search and download packages directly from the Microsoft Store servers.
+- **Link Generator Integration**: Integrated with `store.rg-adguard.net` to fetch direct download links for Appx/MSIX files.
+- **Version History**: Access specific versions of applications.
+
 ### 🎨 Modern Experience
 - **Fluent Design**: Native Windows 11 aesthetics with Mica/Acrylic effects.
 - **Theme Support**: Seamlessly switches between Light and Dark modes based on system settings.
@@ -137,3 +142,8 @@ The solution follows a standard MVVM (Model-View-ViewModel) pattern tailored for
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute.
+
+## 🙏 Credits
+
+- [store.rg-adguard.net](https://store.rg-adguard.net/) - A fantastic service by @rgadguard & mkuba50 that makes the "Package Downloader" feature possible.
+

@@ -67,6 +67,16 @@
                         </StackPanel>
                     </RadioButton>
                     
+                    <RadioButton x:Name="NavStore"
+                                 GroupName="Navigation"
+                                 Style="{StaticResource NavRadioButtonStyle}"
+                                 Margin="0,2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="☁️" FontSize="16" Width="24" />
+                            <TextBlock Text="Package Downloader" VerticalAlignment="Center" Margin="8,0,0,0" />
+                        </StackPanel>
+                    </RadioButton>
+
                     <RadioButton x:Name="NavDiagnostics"
                                  GroupName="Navigation"
                                  Style="{StaticResource NavRadioButtonStyle}"
@@ -104,6 +114,10 @@
                 <views:PackageListView x:Name="InstalledView"
                                        Visibility="{Binding IsChecked, ElementName=NavInstalled, Converter={StaticResource BoolToVisibilityConverter}}" />
                 
+                <!-- Store View -->
+                <views:StoreView x:Name="StoreViewCtrl"
+                                 Visibility="{Binding IsChecked, ElementName=NavStore, Converter={StaticResource BoolToVisibilityConverter}}" />
+
                 <!-- Diagnostics View -->
                 <views:DiagnosticsView x:Name="DiagnosticsViewCtrl"
                                        Visibility="{Binding IsChecked, ElementName=NavDiagnostics, Converter={StaticResource BoolToVisibilityConverter}}" />
