@@ -1,140 +1,140 @@
 # AppxBundle Installer
 
-A lightweight, native Windows desktop application for managing Appx, AppxBundle, MSIX, and MSIXBundle packages.
+A lightweight, modern Windows desktop application for managing Appx, AppxBundle, MSIX, and MSIXBundle packages. Built with .NET 8 and WPF, featuring a Fluent Design interface.
 
-![.NET 8](https://img.shields.io/badge/.NET-8.0-blue)
-![Windows 10+](https://img.shields.io/badge/Windows-10%2F11-blue)
+![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
+![Windows 10+](https://img.shields.io/badge/Windows-10%2F11-0078D4)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
-## Features
+<details>
+<summary><b>📸 Screenshots (Click to Expand)</b></summary>
+<br>
 
-### 📦 Package Installation
-- **Drag and drop** any `.appx`, `.appxbundle`, `.msix`, or `.msixbundle` file
-- Validates file type and architecture compatibility before install
-- Shows package name, version, publisher, and signature status
-- Real-time installation progress
+### Main Dashboard
+![Main Interface](Screenshot1.png)
 
-### 📋 Installed Apps Browser
-- Lists all installed Appx/MSIX packages
-- Filter by publisher (Microsoft / Third-party)
-- Search by name, family name, or publisher
-- View version, install location, and scope
+### Package Management
+![Installed Apps](Screenshot2.png)
 
-### 🗑️ Safe Uninstallation
-- One-click uninstall with confirmation
-- System-protected package detection and warnings
-- Progress tracking and result feedback
+### Settings & Logs
+![Settings](Screenshot3.png)
 
-### 🔍 Diagnostics
-- Full technical logging for troubleshooting
-- Human-readable error messages
-- Export logs to file
+</details>
 
-### 🎨 Modern UI
-- Fluent Design / WinUI-style interface
-- Light and dark mode support
-- Keyboard and mouse friendly
+## ✨ Features
 
-## Requirements
+### 📦 Smart Package Installation
+- **Drag & Drop Support**: Simply drag `.appx`, `.appxbundle`, `.msix`, or `.msixbundle` files to install.
+- **Pre-Install Validation**: Automatically checks file integrity, architecture compatibility, and signature status before installation prevents errors.
+- **Detailed Metadata**: Views package display names, versions, publisher info, and capabilities.
+- **Real-Time Progress**: Visual feedback during the installation process.
 
-- **Windows 10 version 1809** or later (including Windows 11)
-- Works on Enterprise and IoT LTSC editions
-- **.NET 8.0 Runtime** (Windows Desktop)
-- For unsigned packages: **Developer Mode** or **Sideloading** enabled
+### 📋 Installed Apps Management
+- **Centralized Library**: View all Appx/MSIX packages installed on your system in one clean list.
+- **Advanced Filtering**: Filter by "User Installed", "System/Framework", or "Microsoft" apps.
+- **Search**: Instantly find packages by Name, PackageFamilyName, or Publisher.
+- **Safe Uninstallation**: Uninstall apps with built-in protections against removing critical system packages.
 
-## Building
+### 🛡️ Security & Privacy
+- **Critical App Protection**: Prevents accidental removal of system-critical apps (e.g., ShellExperienceHost, StartMenu).
+- **Diagnostics**: Comprehensive logging system for troubleshooting installation failures.
+- **Privacy Focused**: No telemetry, no ads, no background services.
 
-### Prerequisites
-1. Install [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-2. Install [Visual Studio 2022](https://visualstudio.microsoft.com/) with:
-   - .NET Desktop Development workload
-   - Windows 10 SDK (10.0.19041.0 or later)
+### 🎨 Modern Experience
+- **Fluent Design**: Native Windows 11 aesthetics with Mica/Acrylic effects.
+- **Theme Support**: Seamlessly switches between Light and Dark modes based on system settings.
+- **Responsive**: Adaptive layout that works on various window sizes.
 
-### Build Commands
+---
+
+## 💻 prerequisites
+
+To run or build the application, ensure your system meets the following requirements:
+
+### System Requirements
+- **OS**: Windows 10 (Version 1809, Build 17763 or later) or Windows 11.
+- **Architecture**: x64 or ARM64.
+- **Developer Mode**: Recommended for installing unsigned packages (Settings -> Update & Security -> For developers).
+
+---
+
+## 🛠️ Building the Project
+
+This project is built using **.NET 8 (Desktop)**. Follow these steps to set up your environment and compile the application.
+
+### 1. Developer Environment
+Ensure you have the following installed:
+- [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) (Community, Professional, or Enterprise)
+- **Workload required**: ".NET Desktop Development"
+- **Individual Component**: "Windows 10 SDK (10.0.19041.0)" or later.
+
+### 2. Clone & Restore
 ```powershell
-# Clone and navigate to project
+# Clone the repository
+git clone https://github.com/jdros15/AppxBundle-Installer.git
 cd "AppxBundle Installer"
 
-# Restore dependencies
+# Restore NuGet packages
 dotnet restore
+```
 
-# Build
-dotnet build
-
-# Run
+### 3. Development Build
+For quick testing and debugging:
+```powershell
 dotnet run --project AppxBundleInstaller
 ```
 
-### Publish as Single Executable
+### 4. 🚀 Optimized Production Build (Important)
+To create a standalone executabe that is **optimized for size** (avoiding the 250MB+ bloat of standard self-contained builds), use the following command. 
+
+This command enables **Single File** publishing and **Compression**, which drastically reduces the final `.exe` size (typically ~60-80MB for a fully self-contained app).
+
 ```powershell
-dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
+# Publish optimized standalone executable
+dotnet publish AppxBundleInstaller/AppxBundleInstaller.csproj `
+    -c Release `
+    -r win-x64 `
+    --self-contained true `
+    -p:PublishSingleFile=true `
+    -p:EnableCompressionInSingleFile=true `
+    -p:DebugType=embedded
 ```
 
-## Usage
+**Output Location**:  
+`AppxBundleInstaller/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/`
 
-### Installing a Package
-1. Launch the application
-2. Drag and drop a package file onto the drop zone, or click **Browse**
-3. Review the package information (name, version, publisher, signature)
-4. Click **Install**
-5. Monitor progress - you'll see a success or error message
+> **Note**: The resulting `.exe` includes the .NET Runtime, so users **do not** need to install .NET manually.
 
-### Managing Installed Apps
-1. Click **Installed Apps** in the navigation
-2. Use the search box to find specific packages
-3. Filter by publisher type if needed
-4. Select a package to see details
-5. Click **Uninstall** to remove (with confirmation)
+---
 
-### Troubleshooting
-1. Click **Diagnostics** in the navigation
-2. Review the log for errors
-3. Check system info (sideloading status, elevation)
-4. Export logs for support
+## 🔧 Troubleshooting
 
-## Architecture
+### Common Installation Errors
 
-```
-AppxBundleInstaller/
-├── Models/           # Data models (PackageInfo, OperationResult)
-├── Services/         # Business logic
-│   ├── PackageManagerService      # Install/uninstall operations
-│   ├── PackageEnumerationService  # List installed packages
-│   ├── PackageValidationService   # Validate package files
-│   ├── ErrorDecoderService        # Human-readable errors
-│   ├── DiagnosticsService         # Logging
-│   └── ElevationService           # UAC handling
-├── ViewModels/       # MVVM ViewModels
-├── Views/            # XAML user controls
-├── Converters/       # XAML value converters
-└── Themes/           # Light/Dark theme resources
-```
+| Error Code | Helper Text | Solution |
+|------------|-------------|----------|
+| `0x800B0100` | No Signature | Enable **Developer Mode** in Windows Settings or sign the package with a trusted certificate. |
+| `0x80073CF3` | Dependency Error | The package depends on a framework (e.g., VCLibs) that is missing. Install dependencies first. |
+| `0x80070005` | Access Denied | Run the installer as Administrator or check if Group Policies block sideloading. |
+| `0x80073CFF` | License Issue | A valid license is required for this app or side-loading is disabled. |
 
-## Security
+### Diagnostics
+If the application behaves unexpectedly, navigate to the **Logs** (or Diagnostics) tab. You can export the logs to a text file for analysis.
 
-- ✅ **No arbitrary script execution** - Uses only Windows APIs
-- ✅ **Signature verification** - Warns about unsigned packages
-- ✅ **UAC consent** - Clear prompts before elevation
-- ✅ **No background services** - All operations are user-initiated
-- ✅ **No telemetry** - Zero network calls except for package operations
-- ✅ **No ads**
+---
 
-## Common Error Codes
+## 🏗️ Architecture
 
-| Code | Meaning |
-|------|---------|
-| 0x80073CF3 | Missing dependencies |
-| 0x80073CFF | Blocked by policy |
-| 0x800B0100 | Unsigned package (enable Developer Mode) |
-| 0x80070005 | Administrator privileges required |
+The solution follows a standard MVVM (Model-View-ViewModel) pattern tailored for WPF:
 
-## License
+- **`Views/`**: XAML UI definitions (MainWindow, InstallView, SettingsView).
+- **`ViewModels/`**: Logic bindings (InstallViewModel, AppListViewModel).
+- **`Services/`**: Core logic (PackageManager, Elevation, Logging).
+  - `PackageManagerService.cs`: Wraps functionality around `Windows.Management.Deployment`.
+  - `PackageValidationService.cs`: Validates file headers and manifests.
+- **`Models/`**: Data structures (PackageInfo, LogEntry).
 
-MIT License - feel free to use and modify.
+## 📄 License
 
-## Contributing
-
-Contributions welcome! Please ensure any changes:
-- Follow existing code style
-- Include appropriate error handling
-- Work on Windows 10 1809+
+This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute.
