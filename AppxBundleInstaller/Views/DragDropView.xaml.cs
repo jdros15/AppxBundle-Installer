@@ -16,6 +16,29 @@ public partial class DragDropView : UserControl
     public DragDropView()
     {
         InitializeComponent();
+        this.Loaded += DragDropView_Loaded;
+        this.Unloaded += DragDropView_Unloaded;
+    }
+
+    private void DragDropView_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (MainViewModel.Current != null)
+        {
+            MainViewModel.Current.InstallRequested += OnInstallRequested;
+        }
+    }
+
+    private void DragDropView_Unloaded(object sender, RoutedEventArgs e)
+    {
+        if (MainViewModel.Current != null)
+        {
+            MainViewModel.Current.InstallRequested -= OnInstallRequested;
+        }
+    }
+
+    private void OnInstallRequested(object? sender, (string Path, bool AutoInstall) args)
+    {
+        Dispatcher.Invoke(() => ProcessFile(args.Path, args.AutoInstall));
     }
     
     private MainViewModel? MainVm => DataContext as MainViewModel 
@@ -32,7 +55,7 @@ public partial class DragDropView : UserControl
         
         if (dialog.ShowDialog() == true)
         {
-            ProcessFile(dialog.FileName);
+            ProcessFile(dialog.FileName, false);
         }
     }
     
@@ -71,7 +94,7 @@ public partial class DragDropView : UserControl
             var files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files.Length > 0)
             {
-                ProcessFile(files[0]);
+                ProcessFile(files[0], false);
             }
         }
     }
@@ -96,7 +119,7 @@ public partial class DragDropView : UserControl
         DropZone.Background = (Brush)FindResource("SystemControlBackgroundChromeMediumLowBrush");
     }
     
-    private async void ProcessFile(string filePath)
+    private async void ProcessFile(string filePath, bool autoInstall)
     {
         MainVm?.Diagnostics?.Log(Models.LogLevel.Info, $"Processing: {Path.GetFileName(filePath)}");
         
@@ -117,20 +140,24 @@ public partial class DragDropView : UserControl
                 return;
             }
             
-            // Show package info and confirm
-            var message = $"Package: {info!.DisplayName}\n" +
-                         $"Version: {info.Version}\n" +
-                         $"Publisher: {info.PublisherDisplayName}\n" +
-                         $"Architecture: {info.Architecture}\n" +
-                         $"Signature: {info.SignatureStatus}\n\n" +
-                         "Do you want to install this package?";
+            // Ask for confirmation unless auto-install is requested
+            bool proceed = autoInstall;
             
-            var result = MessageBox.Show(message, "Install Package", 
-                MessageBoxButton.YesNo, MessageBoxImage.Question);
-            
-            if (result == MessageBoxResult.Yes)
+            if (!autoInstall)
             {
-                StatusText.Text = $"Installing {info.DisplayName}...";
+                // Simplified confirmation view
+                var result = MessageBox.Show(
+                    "Do you want to install this package?",
+                    "Install Package", 
+                    MessageBoxButton.YesNo, 
+                    MessageBoxImage.Question);
+                
+                proceed = (result == MessageBoxResult.Yes);
+            }
+            
+            if (proceed)
+            {
+                StatusText.Text = $"Installing {info!.DisplayName}...";
                 ProgressBar.IsIndeterminate = true;
                 
                 var packageManager = new PackageManagerService(MainVm?.Diagnostics ?? new DiagnosticsService());
@@ -139,8 +166,23 @@ public partial class DragDropView : UserControl
                 if (installResult.Success)
                 {
                     MainVm?.Diagnostics?.Log(Models.LogLevel.Success, $"Installed: {info.DisplayName}");
-                    MessageBox.Show($"Successfully installed {info.DisplayName}!", "Success", 
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    
+                    // Refresh installed apps list
+                    MainVm?.NotifyPackagesChanged();
+                    
+                    if (!autoInstall)
+                    {
+                        MessageBox.Show($"Successfully installed {info.DisplayName}!", "Success", 
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        // Notification for auto-install (toast or simple log, user requested "inform user")
+                        // Using a non-blocking way or a fleeting message would be better, but a MessageBox is what they asked for "inform user"
+                        // Or maybe they meant just a status update? "just install and inform user it's been installed" implies a notification.
+                         MessageBox.Show($"Successfully installed {info.DisplayName}!", "Success", 
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 }
                 else
                 {

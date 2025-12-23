@@ -28,6 +28,7 @@ public partial class PackageListView : UserControl
         if (MainVm != null)
         {
             MainVm.PropertyChanged += MainVm_PropertyChanged;
+            MainVm.PackagesChanged += MainVm_PackagesChanged;
         }
         await LoadPackages();
     }
@@ -40,6 +41,11 @@ public partial class PackageListView : UserControl
         {
             await LoadPackages();
         }
+    }
+
+    private async void MainVm_PackagesChanged(object? sender, EventArgs e)
+    {
+        await LoadPackages();
     }
     
     private async System.Threading.Tasks.Task LoadPackages()

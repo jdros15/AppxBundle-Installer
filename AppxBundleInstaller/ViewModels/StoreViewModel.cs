@@ -8,6 +8,8 @@ using System.Windows.Input;
 using AppxBundleInstaller.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.IO;
+using AppxBundleInstaller.Services;
 
 namespace AppxBundleInstaller.ViewModels;
 
@@ -35,9 +37,22 @@ public partial class StoreViewModel : ObservableObject
     public List<string> SearchTypes { get; } = new() { "url", "ProductId", "PackageFamilyName", "CategoryId" };
     public List<string> Rings { get; } = new() { "Retail", "RP", "WIS", "WIF" };
 
+    [ObservableProperty]
+    private bool _isAutoInstall;
+    
     public StoreViewModel()
     {
         _httpClient = new HttpClient();
+        
+        // Settings Sync
+        IsAutoInstall = SettingsService.Instance.AutoInstall;
+        SettingsService.Instance.PropertyChanged += (s, e) => 
+        {
+            if (e.PropertyName == nameof(SettingsService.AutoInstall))
+            {
+                IsAutoInstall = SettingsService.Instance.AutoInstall;
+            }
+        };
     }
 
     [RelayCommand]
@@ -51,6 +66,7 @@ public partial class StoreViewModel : ObservableObject
 
         IsLoading = true;
         StatusMessage = "Searching...";
+        DiagnosticsService.Instance.Log(LogLevel.Info, $"Searching Store for: {SearchUrl} ({SelectedType})");
         StoreItems.Clear();
 
         try
@@ -69,11 +85,14 @@ public partial class StoreViewModel : ObservableObject
             var html = await response.Content.ReadAsStringAsync();
             ParseResults(html);
 
-            StatusMessage = StoreItems.Count > 0 ? $"Found {StoreItems.Count} items." : "No items found.";
+            var msg = StoreItems.Count > 0 ? $"Found {StoreItems.Count} items." : "No items found.";
+            StatusMessage = msg;
+            DiagnosticsService.Instance.Log(LogLevel.Info, $"Search completed. {msg}");
         }
         catch (Exception ex)
         {
             StatusMessage = $"Error: {ex.Message}";
+            DiagnosticsService.Instance.Log(LogLevel.Error, "Search failed", ex.Message);
         }
         finally
         {
@@ -83,19 +102,6 @@ public partial class StoreViewModel : ObservableObject
 
     private void ParseResults(string html)
     {
-        // Simple regex parsing for the table rows
-        // Structure is approximately:
-        // <tr style="...">
-        //   <td><a href="(link)" ...>(name)</a></td> (sometimes name contains <br>)
-        //   <td>(expire)</td>
-        //   <td>(sha1)</td>
-        //   <td>(size)</td>
-        // </tr>
-
-        // We target the <a> tag specifically to get the link and name
-        // Then we try to find the size in the subsequent tds
-
-        // Pattern to match the row
         var rowPattern = @"<tr.*?>(.*?)</tr>";
         var rows = Regex.Matches(html, rowPattern, RegexOptions.Singleline);
 
@@ -103,17 +109,12 @@ public partial class StoreViewModel : ObservableObject
         {
             var rowContent = row.Groups[1].Value;
 
-            // Extract Link and Name
             var linkMatch = Regex.Match(rowContent, @"<a\s+href=""([^""]+)""[^>]*>(.*?)</a>", RegexOptions.Singleline);
             if (!linkMatch.Success) continue;
 
             string url = linkMatch.Groups[1].Value;
             string name = linkMatch.Groups[2].Value;
 
-            // Clean up name (sometimes has <br> or other tags? Usually clean text)
-            // But sometimes the site returns error messages in the table.
-            
-            // Extract Size (it's usually in the 4th td, but let's just grab all tds)
             var tds = Regex.Matches(rowContent, @"<td.*?>(.*?)</td>", RegexOptions.Singleline);
             
             string expire = "";
@@ -132,10 +133,6 @@ public partial class StoreViewModel : ObservableObject
                 FileSize = size
             };
 
-            // Parse version/arch from Name if possible?
-            // Name format is typically: PackageName_Version_Arch_...
-            // e.g. Microsoft.WindowsCalculator_11.2210.0.0_neutral_~_8wekyb3d8bbwe.msixbundle
-            
             StoreItems.Add(item);
         }
     }
@@ -147,12 +144,76 @@ public partial class StoreViewModel : ObservableObject
 
         try 
         {
-            // For now, let's just open in browser as it is robust and handles large files/resume
-            Process.Start(new ProcessStartInfo(item.DownloadUrl) { UseShellExecute = true });
+            IsLoading = true;
+            StatusMessage = $"Downloading {item.Name}...";
+            DiagnosticsService.Instance.Log(LogLevel.Info, $"Starting download: {item.Name}", $"URL: {item.DownloadUrl}");
+
+            string downloadFolder = SettingsService.Instance.DownloadFolderPath;
+            if (!Directory.Exists(downloadFolder))
+            {
+                Directory.CreateDirectory(downloadFolder);
+            }
+
+            string fileName = item.Name;
+            foreach(char c in Path.GetInvalidFileNameChars())
+            {
+                fileName = fileName.Replace(c, '_');
+            }
+            
+            string filePath = Path.Combine(downloadFolder, fileName);
+            
+            // Overwrite if exists
+            using (var stream = await _httpClient.GetStreamAsync(item.DownloadUrl))
+            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                await stream.CopyToAsync(fileStream);
+            }
+
+            if (!File.Exists(filePath)) throw new FileNotFoundException("File not found after download", filePath);
+
+            bool autoInstall = SettingsService.Instance.AutoInstall;
+            StatusMessage = $"Downloaded to {filePath}";
+            DiagnosticsService.Instance.Log(LogLevel.Success, "Download successful", filePath);
+
+            if (autoInstall)
+            {
+                string ext = Path.GetExtension(fileName).ToLower();
+                var supported = new[] { ".appx", ".msix", ".appxbundle", ".msixbundle", ".eappx", ".emsix", ".eappxbundle", ".emsixbundle" };
+
+                if (supported.Contains(ext))
+                {
+                   StatusMessage = "Switching to Install...";
+                   DiagnosticsService.Instance.Log(LogLevel.Info, "Auto-install enabled. Switching to installer view...");
+                   
+                   Application.Current.Dispatcher.Invoke(() => 
+                   {
+                       MainViewModel.Current?.RequestInstall(filePath, true);
+                   });
+                   
+                   StatusMessage = "Ready";
+                }
+                else
+                {
+                     MessageBox.Show($"File downloaded to:\n{filePath}\n\nAuto-install is not supported for this file type.", "Download Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                     DiagnosticsService.Instance.Log(LogLevel.Warning, "Auto-install skipped: Unsupported file type", ext);
+                     StatusMessage = "Ready";
+                }
+            }
+            else
+            {
+                StatusMessage = "Download Complete";
+                MessageBox.Show($"File downloaded to:\n{filePath}", "Download Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Could not start download: {ex.Message}");
+            StatusMessage = $"Download failed. Error: {ex.Message}";
+            MessageBox.Show($"Could not download: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            DiagnosticsService.Instance.Log(LogLevel.Error, "Download failed", ex.Message);
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
 }

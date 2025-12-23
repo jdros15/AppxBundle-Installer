@@ -5,8 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ui="http://schemas.modernwpf.com/2019"
              xmlns:vm="clr-namespace:AppxBundleInstaller.ViewModels"
+             xmlns:converters="clr-namespace:AppxBundleInstaller.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <converters:StoreItemActionConverter x:Key="StoreItemActionConverter" />
+    </UserControl.Resources>
 
     <UserControl.DataContext>
         <vm:StoreViewModel />
@@ -98,14 +103,20 @@
                     </GridViewColumn>
                     <GridViewColumn Header="Size" Width="100" DisplayMemberBinding="{Binding FileSize}" />
                     <GridViewColumn Header="Expiration" Width="150" DisplayMemberBinding="{Binding Expiration}" />
-                    <GridViewColumn Header="Action" Width="120">
+                    <GridViewColumn Header="Action" Width="180">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Download" 
-                                        Command="{Binding DataContext.DownloadCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                <Button Command="{Binding DataContext.DownloadCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                         CommandParameter="{Binding}"
                                         Style="{StaticResource DefaultButtonStyle}"
-                                        Padding="8,4" />
+                                        Padding="8,4">
+                                    <Button.Content>
+                                        <MultiBinding Converter="{StaticResource StoreItemActionConverter}">
+                                            <Binding Path="Name" />
+                                            <Binding Path="DataContext.IsAutoInstall" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                        </MultiBinding>
+                                    </Button.Content>
+                                </Button>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

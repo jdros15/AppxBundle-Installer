@@ -8,6 +8,9 @@ namespace AppxBundleInstaller.Services;
 /// </summary>
 public class DiagnosticsService
 {
+    private static DiagnosticsService? _instance;
+    public static DiagnosticsService Instance => _instance ??= new DiagnosticsService();
+
     private readonly ObservableCollection<LogEntry> _logs = new();
     private const int MaxLogEntries = 1000;
     

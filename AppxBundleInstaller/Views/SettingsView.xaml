@@ -72,6 +72,69 @@
                     </StackPanel>
                 </Border>
                 
+                <!-- Downloads Section -->
+                <TextBlock Text="Downloads" 
+                           FontSize="16" 
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                           Margin="0,0,0,16" />
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,24">
+                    <StackPanel>
+                        <!-- Download Location -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                <TextBlock Text="Download Location" 
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                <TextBlock Text="{Binding DownloadFolderPath}" 
+                                           FontSize="12"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                           Margin="0,4,0,0"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                            
+                            <Button Grid.Column="1" 
+                                    Content="Browse"
+                                    Command="{Binding BrowseDownloadFolderCommand}"
+                                    VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Rectangle Height="1" 
+                                   Fill="{DynamicResource SystemControlForegroundBaseLowBrush}" 
+                                   Margin="0,16" />
+
+                        <!-- Auto Install Toggle -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Auto-Install" 
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                <TextBlock Text="Automatically install supported packages after download" 
+                                           FontSize="12"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                           Margin="0,4,0,0" />
+                            </StackPanel>
+                            
+                            <ui:ToggleSwitch Grid.Column="1" 
+                                             IsOn="{Binding AutoInstall, Mode=TwoWay}"
+                                             OnContent=""
+                                             OffContent=""
+                                             VerticalAlignment="Center" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
                 <!-- Advanced Section -->
                 <TextBlock Text="Advanced" 
                            FontSize="16" 
@@ -130,15 +193,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             
-                            <!-- App Icon -->
-                            <Border Background="{DynamicResource SystemControlHighlightAccentBrush}"
-                                    CornerRadius="8"
-                                    Width="48" Height="48"
-                                    Margin="0,0,16,0">
-                                <TextBlock Text="📦" FontSize="24" 
-                                           HorizontalAlignment="Center" 
-                                           VerticalAlignment="Center" />
-                            </Border>
+                            <!-- App Icon removed -->
                             
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="AppxBundle Installer" 
