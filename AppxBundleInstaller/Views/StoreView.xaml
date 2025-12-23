@@ -23,12 +23,14 @@
         <TextBlock Text="Package Downloader" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,24" />
 
         <!-- Search Area -->
-        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
-            <StackPanel>
-                <Grid Margin="0,0,0,12">
+        <StackPanel Grid.Row="1" Margin="0,0,0,6">
+            <!-- Search Area -->
+            <Border Style="{StaticResource CardStyle}">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
@@ -43,7 +45,8 @@
                     <TextBox Grid.Column="1" 
                              Text="{Binding SearchUrl, UpdateSourceTrigger=PropertyChanged}"
                              ui:ControlHelper.PlaceholderText="Paste URL, Product ID, or Package Family Name..."
-                             ui:ControlHelper.CornerRadius="4">
+                             ui:ControlHelper.CornerRadius="4"
+                             Margin="0,0,8,0">
                         <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />
                         </TextBox.InputBindings>
@@ -54,28 +57,29 @@
                               ItemsSource="{Binding Rings}"
                               SelectedItem="{Binding SelectedRing}"
                               Width="100"
-                              Margin="8,0,0,0"
+                              Margin="0,0,8,0"
                               ui:ControlHelper.CornerRadius="4" />
-                </Grid>
 
-                <Button Command="{Binding SearchCommand}" 
-                        Content="Search" 
-                        HorizontalAlignment="Right"
-                        Style="{StaticResource AccentButtonStyle}"
-                        Width="100" />
-                
-                <!-- Status Message -->
-                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                    <ui:ProgressRing IsActive="{Binding IsLoading}" 
-                                     Width="16" Height="16" 
-                                     Margin="0,0,8,0" 
-                                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" />
-                    <TextBlock Text="{Binding StatusMessage}" 
-                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                               VerticalAlignment="Center" />
-                </StackPanel>
+                    <!-- Search Button -->
+                    <Button Grid.Column="3"
+                            Command="{Binding SearchCommand}" 
+                            Content="Search" 
+                            Style="{StaticResource AccentButtonStyle}"
+                            Width="100" />
+                </Grid>
+            </Border>
+
+            <!-- Status Message -->
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <ui:ProgressRing IsActive="{Binding IsLoading}" 
+                                 Width="16" Height="16" 
+                                 Margin="0,0,8,0" 
+                                 Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <TextBlock Text="{Binding StatusMessage}" 
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           VerticalAlignment="Center" />
             </StackPanel>
-        </Border>
+        </StackPanel>
 
         <!-- Results List -->
         <ListView Grid.Row="2" 

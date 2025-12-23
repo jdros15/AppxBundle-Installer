@@ -91,7 +91,7 @@ dotnet run --project AppxBundleInstaller
 ```
 
 ### 4. 🚀 Optimized Production Build (Important)
-To create a standalone executabe that is **optimized for size** (avoiding the 250MB+ bloat of standard self-contained builds), use the following command. 
+To create a standalone executable that is **optimized for size** (avoiding the 250MB+ bloat of standard self-contained builds), use the following command. 
 
 This command enables **Single File** publishing and **Compression**, which drastically reduces the final `.exe` size (typically ~60-80MB for a fully self-contained app).
 
