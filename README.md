@@ -11,14 +11,17 @@ A lightweight, modern Windows desktop application for managing Appx, AppxBundle,
 <summary><b>📸 Screenshots (Click to Expand)</b></summary>
 <br>
 
-### Main Dashboard
-![Main Interface](Screenshot1.png)
+### Main Dashboard (Install)
+![Main Interface](Screenshots/Install%20Package.png)
 
 ### Package Management
-![Installed Apps](Screenshot2.png)
+![Installed Apps](Screenshots/Installed%20Apps.png)
 
-### Settings & Logs
-![Settings](Screenshot3.png)
+### Package Downloader
+![Package Downloader](Screenshots/Package%20Downloader.png)
+
+### Settings
+![Settings](Screenshots/Settings.png)
 
 </details>
 
