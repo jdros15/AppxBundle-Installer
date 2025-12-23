@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using AppxBundleInstaller.Models;
 using AppxBundleInstaller.Services;
@@ -23,7 +24,22 @@ public partial class PackageListView : UserControl
     
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        // Subscribe to MainViewModel property changes to reload when settings change
+        if (MainVm != null)
+        {
+            MainVm.PropertyChanged += MainVm_PropertyChanged;
+        }
         await LoadPackages();
+    }
+    
+    private async void MainVm_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // Reload packages when ShowCriticalApps or ShowAppIcons setting changes
+        if (e.PropertyName == nameof(MainViewModel.ShowCriticalApps) ||
+            e.PropertyName == nameof(MainViewModel.ShowAppIcons))
+        {
+            await LoadPackages();
+        }
     }
     
     private async System.Threading.Tasks.Task LoadPackages()
@@ -37,7 +53,7 @@ public partial class PackageListView : UserControl
             {
                 PublisherType = GetSelectedPublisherType(),
                 IncludeFrameworks = ShowFrameworks.IsChecked == true,
-                IncludeCriticalApps = ShowCriticalApps.IsChecked == true
+                IncludeCriticalApps = MainVm?.ShowCriticalApps ?? false
             };
             
             _allPackages = (await _enumeration.GetInstalledPackagesAsync(filter)).ToList();
@@ -291,35 +307,6 @@ public partial class PackageListView : UserControl
         {
             MainVm?.Diagnostics?.Log(LogLevel.Error, ex.Message);
             MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-    
-    private async void ShowCriticalApps_Checked(object sender, RoutedEventArgs e)
-    {
-        // Show warning dialog when enabling critical apps view
-        var result = MessageBox.Show(
-            "⚠️ WARNING: You are about to show critical system apps.\n\n" +
-            "These apps include:\n" +
-            "• Start Menu\n" +
-            "• Windows Settings\n" +
-            "• Shell Experience (Taskbar)\n" +
-            "• Microsoft Store\n" +
-            "• Windows Security\n" +
-            "• And other essential Windows components\n\n" +
-            "Uninstalling ANY of these apps can cause SERIOUS SYSTEM PROBLEMS that may require a complete Windows reset to fix.\n\n" +
-            "Do you understand the risks and want to proceed?",
-            "⚠️ Critical Apps Warning",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
-        
-        if (result == MessageBoxResult.Yes)
-        {
-            await LoadPackages();
-        }
-        else
-        {
-            // Uncheck the checkbox if user cancels
-            ShowCriticalApps.IsChecked = false;
         }
     }
     

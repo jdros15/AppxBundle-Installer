@@ -31,6 +31,12 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _isDarkMode;
     
+    [ObservableProperty]
+    private bool _showCriticalApps;
+    
+    [ObservableProperty]
+    private bool _showAppIcons = true;
+    
     // Shared state for child view models
     [ObservableProperty]
     private PackageInfo? _selectedPackage;

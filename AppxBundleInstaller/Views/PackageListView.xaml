@@ -46,7 +46,6 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 
                 <TextBox x:Name="SearchBox" 
@@ -87,34 +86,6 @@
                           Unchecked="Filter_Changed"
                           Margin="12,0,0,0"
                           VerticalAlignment="Center" />
-                          
-                <!-- Critical Apps Toggle with Warning Styling -->
-                <CheckBox x:Name="ShowCriticalApps"
-                          Grid.Column="4"
-                          Checked="ShowCriticalApps_Checked"
-                          Unchecked="Filter_Changed"
-                          Margin="16,0,0,0"
-                          VerticalAlignment="Center"
-                          ToolTipService.InitialShowDelay="0"
-                          ToolTipService.ShowDuration="30000">
-                    <CheckBox.ToolTip>
-                        <ToolTip MaxWidth="350">
-                            <StackPanel>
-                                <TextBlock Text="⚠️ WARNING: Critical System Apps" FontWeight="Bold" Foreground="#FFD54F" Margin="0,0,0,8" />
-                                <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
-                                    Enabling this will show critical Windows system apps like Start Menu, Settings, Shell, and other essential components.
-                                </TextBlock>
-                                <TextBlock TextWrapping="Wrap" FontWeight="SemiBold" Foreground="#FF6B6B">
-                                    Uninstalling these apps can cause serious system instability, prevent Windows from starting properly, or require a system reset to fix.
-                                </TextBlock>
-                            </StackPanel>
-                        </ToolTip>
-                    </CheckBox.ToolTip>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="⚠️" FontSize="12" Margin="0,0,4,0" VerticalAlignment="Center" />
-                        <TextBlock Text="Critical Apps" Foreground="#FF6B6B" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    </StackPanel>
-                </CheckBox>
             </Grid>
         </Border>
         
@@ -145,6 +116,10 @@
                     <ColumnDefinition Width="120" />
                     <ColumnDefinition Width="60" />
                 </Grid.ColumnDefinitions>
+                
+                <!-- Icon Column Placeholder (for alignment) -->
+                <Border Grid.Column="0"
+                        Visibility="{Binding DataContext.ShowAppIcons, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
                 
                 <TextBlock Grid.Column="1" Text="Name" 
                            FontWeight="SemiBold" FontSize="12"
@@ -189,7 +164,8 @@
                             </Grid.ColumnDefinitions>
                             
                             <!-- Icon - Shows app logo if available, otherwise fallback emoji -->
-                            <Grid Grid.Column="0" Width="36" Height="36">
+                            <Grid Grid.Column="0" Width="36" Height="36"
+                                  Visibility="{Binding DataContext.ShowAppIcons, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
                                 <!-- Actual app icon when available -->
                                 <Border CornerRadius="6"
                                         Visibility="{Binding LogoPath, Converter={StaticResource StringNotEmptyToVisibility}}">
