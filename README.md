@@ -7,6 +7,9 @@ A lightweight, modern Windows desktop application for managing Appx, AppxBundle,
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
+## 📥 Download
+[**Get the latest version here**](https://github.com/jdros15/AppxBundle-Installer/releases)
+
 <details>
 <summary><b>📸 Screenshots (Click to Expand)</b></summary>
 <br>
