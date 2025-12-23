@@ -58,6 +58,23 @@ public class PackageInfo
     /// Capabilities requested by this package
     /// </summary>
     public List<string> Capabilities { get; set; } = new();
+    
+    /// <summary>
+    /// Gets the package type based on publisher and framework status
+    /// </summary>
+    public PackageType Type => IsFramework ? PackageType.Framework 
+                              : IsMicrosoft ? PackageType.Microsoft 
+                              : PackageType.ThirdParty;
+}
+
+/// <summary>
+/// Package type classification for display
+/// </summary>
+public enum PackageType
+{
+    Microsoft,
+    ThirdParty,
+    Framework
 }
 
 public enum SignatureStatus
