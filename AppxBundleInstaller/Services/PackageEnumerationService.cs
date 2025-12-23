@@ -160,7 +160,68 @@ public class PackageEnumerationService
     
     private string? TryGetLogoPath(Windows.ApplicationModel.Package package)
     {
-        try { return package.Logo?.LocalPath; }
+        try 
+        {
+            // First try the Logo property
+            var logoUri = package.Logo;
+            if (logoUri != null)
+            {
+                var logoPath = logoUri.LocalPath;
+                
+                // If it's an absolute path and exists, use it
+                if (!string.IsNullOrEmpty(logoPath) && System.IO.File.Exists(logoPath))
+                    return logoPath;
+                
+                // If it's relative, combine with install location
+                if (!string.IsNullOrEmpty(logoPath))
+                {
+                    var installLocation = package.InstalledLocation?.Path;
+                    if (!string.IsNullOrEmpty(installLocation))
+                    {
+                        // Handle ms-appx:// style paths by extracting the relative part
+                        var relativePath = logoPath.TrimStart('/').Replace('/', '\\');
+                        var fullPath = System.IO.Path.Combine(installLocation, relativePath);
+                        if (System.IO.File.Exists(fullPath))
+                            return fullPath;
+                    }
+                }
+            }
+            
+            // If Logo property didn't work, search for common logo files in install location
+            var location = package.InstalledLocation?.Path;
+            if (!string.IsNullOrEmpty(location) && System.IO.Directory.Exists(location))
+            {
+                // Common logo file patterns in AppX packages
+                string[] logoPatterns = new[]
+                {
+                    "Assets\\*logo*.png",
+                    "Assets\\*Logo*.png",
+                    "Assets\\Square44x44Logo*.png",
+                    "Assets\\Square150x150Logo*.png",
+                    "Assets\\StoreLogo*.png",
+                    "*logo*.png",
+                    "*Logo*.png"
+                };
+                
+                foreach (var pattern in logoPatterns)
+                {
+                    try
+                    {
+                        var files = System.IO.Directory.GetFiles(location, 
+                            pattern.Contains("\\") ? System.IO.Path.GetFileName(pattern) : pattern,
+                            pattern.Contains("\\") ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly);
+                        
+                        // Prefer smaller scale icons (more common use case)
+                        var file = files.OrderBy(f => f.Length).FirstOrDefault();
+                        if (!string.IsNullOrEmpty(file))
+                            return file;
+                    }
+                    catch { /* Continue trying other patterns */ }
+                }
+            }
+            
+            return null;
+        }
         catch { return null; }
     }
     

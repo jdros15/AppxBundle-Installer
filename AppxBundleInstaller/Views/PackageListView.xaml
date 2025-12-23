@@ -9,6 +9,9 @@
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
         <converters:PackageTypeToStringConverter x:Key="PackageTypeToString" />
         <converters:PackageTypeToBrushConverter x:Key="PackageTypeToBrush" />
+        <converters:LogoPathToImageSourceConverter x:Key="LogoPathToImage" />
+        <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibility" />
+        <converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibility" />
     </UserControl.Resources>
     
     <Grid>
@@ -185,14 +188,25 @@
                                 <ColumnDefinition Width="60" />
                             </Grid.ColumnDefinitions>
                             
-                            <!-- Icon -->
-                            <Border Grid.Column="0" 
-                                    Width="36" Height="36"
-                                    Background="{DynamicResource SystemControlHighlightAccentBrush}"
-                                    CornerRadius="6">
-                                <TextBlock Text="📦" FontSize="18" 
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
+                            <!-- Icon - Shows app logo if available, otherwise fallback emoji -->
+                            <Grid Grid.Column="0" Width="36" Height="36">
+                                <!-- Actual app icon when available -->
+                                <Border CornerRadius="6"
+                                        Visibility="{Binding LogoPath, Converter={StaticResource StringNotEmptyToVisibility}}">
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding LogoPath, Converter={StaticResource LogoPathToImage}}"
+                                                    Stretch="UniformToFill" />
+                                    </Border.Background>
+                                </Border>
+                                
+                                <!-- Fallback icon when no logo available -->
+                                <Border Background="{DynamicResource SystemControlHighlightAccentBrush}"
+                                        CornerRadius="6"
+                                        Visibility="{Binding LogoPath, Converter={StaticResource StringEmptyToVisibility}}">
+                                    <TextBlock Text="📦" FontSize="18" 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                            </Grid>
                             
                             <!-- Name & Publisher -->
                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,16,0">
