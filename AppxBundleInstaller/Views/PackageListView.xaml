@@ -110,7 +110,7 @@
             <!-- Column Headers - Add right margin to account for scrollbar -->
             <Grid Grid.Row="0" Margin="12,0,28,8">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="44" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="120" />
@@ -119,6 +119,7 @@
                 
                 <!-- Icon Column Placeholder (for alignment) -->
                 <Border Grid.Column="0"
+                        Width="44"
                         Visibility="{Binding DataContext.ShowAppIcons, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
                 
                 <TextBlock Grid.Column="1" Text="Name" 
@@ -156,7 +157,7 @@
                     <DataTemplate>
                         <Grid Margin="0,8">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="44" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="90" />
                                 <ColumnDefinition Width="120" />
@@ -164,10 +165,12 @@
                             </Grid.ColumnDefinitions>
                             
                             <!-- Icon - Shows app logo if available, otherwise fallback emoji -->
-                            <Grid Grid.Column="0" Width="36" Height="36"
+                            <Grid Grid.Column="0" Width="44" Height="36"
                                   Visibility="{Binding DataContext.ShowAppIcons, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
                                 <!-- Actual app icon when available -->
                                 <Border CornerRadius="6"
+                                        Width="36" Height="36"
+                                        HorizontalAlignment="Left"
                                         Visibility="{Binding LogoPath, Converter={StaticResource StringNotEmptyToVisibility}}">
                                     <Border.Background>
                                         <ImageBrush ImageSource="{Binding LogoPath, Converter={StaticResource LogoPathToImage}}"
@@ -178,6 +181,8 @@
                                 <!-- Fallback icon when no logo available -->
                                 <Border Background="{DynamicResource SystemControlHighlightAccentBrush}"
                                         CornerRadius="6"
+                                        Width="36" Height="36"
+                                        HorizontalAlignment="Left"
                                         Visibility="{Binding LogoPath, Converter={StaticResource StringEmptyToVisibility}}">
                                     <TextBlock Text="📦" FontSize="18" 
                                                HorizontalAlignment="Center" VerticalAlignment="Center" />
