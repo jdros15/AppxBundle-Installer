@@ -153,7 +153,7 @@
                                            FontSize="12"
                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                     Margin="0,8,0,0" />
-                                <TextBlock Text="JD Ros" 
+                                <TextBlock Text="by JD Ros" 
                                            FontSize="12"
                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                            Margin="0,2,0,0" />
