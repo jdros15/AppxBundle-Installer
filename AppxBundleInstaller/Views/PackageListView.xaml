@@ -4,6 +4,10 @@
              xmlns:ui="http://schemas.modernwpf.com/2019"
              Loaded="OnLoaded">
     
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -33,6 +37,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -76,6 +81,34 @@
                           Unchecked="Filter_Changed"
                           Margin="12,0,0,0"
                           VerticalAlignment="Center" />
+                          
+                <!-- Critical Apps Toggle with Warning Styling -->
+                <CheckBox x:Name="ShowCriticalApps"
+                          Grid.Column="4"
+                          Checked="ShowCriticalApps_Checked"
+                          Unchecked="Filter_Changed"
+                          Margin="16,0,0,0"
+                          VerticalAlignment="Center"
+                          ToolTipService.InitialShowDelay="0"
+                          ToolTipService.ShowDuration="30000">
+                    <CheckBox.ToolTip>
+                        <ToolTip MaxWidth="350">
+                            <StackPanel>
+                                <TextBlock Text="⚠️ WARNING: Critical System Apps" FontWeight="Bold" Foreground="#FFD54F" Margin="0,0,0,8" />
+                                <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                                    Enabling this will show critical Windows system apps like Start Menu, Settings, Shell, and other essential components.
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" FontWeight="SemiBold" Foreground="#FF6B6B">
+                                    Uninstalling these apps can cause serious system instability, prevent Windows from starting properly, or require a system reset to fix.
+                                </TextBlock>
+                            </StackPanel>
+                        </ToolTip>
+                    </CheckBox.ToolTip>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⚠️" FontSize="12" Margin="0,0,4,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Critical Apps" Foreground="#FF6B6B" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
+                </CheckBox>
             </Grid>
         </Border>
         
@@ -154,10 +187,22 @@
                             
                             <!-- Name & Publisher -->
                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,16,0">
-                                <TextBlock Text="{Binding DisplayName}" 
-                                           FontWeight="SemiBold"
-                                           TextTrimming="CharacterEllipsis"
-                                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding DisplayName}" 
+                                               FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis"
+                                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                    <!-- System-Protected Icon -->
+                                    <TextBlock Text="⛔" FontSize="11" Margin="6,0,0,0" 
+                                               VerticalAlignment="Center"
+                                               ToolTip="System-Protected Package - Windows considers this essential"
+                                               Visibility="{Binding IsSystemProtected, Converter={StaticResource BoolToVisibility}}" />
+                                    <!-- Critical App Warning Icon (only show if not already system-protected) -->
+                                    <TextBlock Text="⚠️" FontSize="12" Margin="6,0,0,0" 
+                                               VerticalAlignment="Center"
+                                               ToolTip="Critical System App - Uninstalling may break Windows"
+                                               Visibility="{Binding IsCriticalSystemApp, Converter={StaticResource BoolToVisibility}}" />
+                                </StackPanel>
                                 <TextBlock Text="{Binding PublisherDisplayName}" 
                                            FontSize="12"
                                            TextTrimming="CharacterEllipsis"

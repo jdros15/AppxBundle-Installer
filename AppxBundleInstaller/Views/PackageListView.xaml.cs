@@ -36,7 +36,8 @@ public partial class PackageListView : UserControl
             var filter = new PackageFilter
             {
                 PublisherType = GetSelectedPublisherType(),
-                IncludeFrameworks = ShowFrameworks.IsChecked == true
+                IncludeFrameworks = ShowFrameworks.IsChecked == true,
+                IncludeCriticalApps = ShowCriticalApps.IsChecked == true
             };
             
             _allPackages = (await _enumeration.GetInstalledPackagesAsync(filter)).ToList();
@@ -141,10 +142,20 @@ public partial class PackageListView : UserControl
             ActionPanel.Visibility = Visibility.Visible;
             StatusText.Visibility = Visibility.Collapsed;
             
-            UninstallButton.IsEnabled = !_selectedPackage.IsSystemProtected;
+            // Always enable uninstall, but show warning tooltips
+            UninstallButton.IsEnabled = true;
+            
             if (_selectedPackage.IsSystemProtected)
             {
-                UninstallButton.ToolTip = "System-protected package";
+                UninstallButton.ToolTip = "⚠️ System-protected package - Uninstall at your own risk!";
+            }
+            else if (_selectedPackage.IsCriticalSystemApp)
+            {
+                UninstallButton.ToolTip = "⚠️ Critical system app - Uninstalling may break Windows!";
+            }
+            else
+            {
+                UninstallButton.ToolTip = null;
             }
         }
         else
@@ -174,18 +185,88 @@ public partial class PackageListView : UserControl
     {
         if (_selectedPackage == null) return;
         
+        // Warning for system-protected packages - allow with explicit warning
         if (_selectedPackage.IsSystemProtected)
         {
-            MessageBox.Show("This is a system-protected package and cannot be uninstalled.", 
-                "Cannot Uninstall", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
+            var protectedWarningResult = MessageBox.Show(
+                $"⛔ SYSTEM-PROTECTED PACKAGE ⛔\n\n" +
+                $"'{_selectedPackage.DisplayName}' is marked as SYSTEM-PROTECTED by Windows.\n\n" +
+                $"This means Windows considers this package essential for system operation.\n\n" +
+                $"Uninstalling this package may:\n" +
+                $"• Cause immediate system instability\n" +
+                $"• Prevent Windows features from working\n" +
+                $"• Require system recovery or reinstallation\n" +
+                $"• Result in data loss\n\n" +
+                $"Do you understand the risks and want to attempt uninstallation anyway?",
+                "⛔ System-Protected Package Warning ⛔",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Stop);
+            
+            if (protectedWarningResult != MessageBoxResult.Yes)
+                return;
+            
+            // Second confirmation for system-protected
+            var finalProtectedResult = MessageBox.Show(
+                $"⛔ FINAL WARNING ⛔\n\n" +
+                $"You are about to attempt uninstalling a SYSTEM-PROTECTED package.\n\n" +
+                $"This operation may fail or cause serious problems.\n\n" +
+                $"Click NO to cancel (STRONGLY RECOMMENDED).",
+                "⛔ Confirm System-Protected Uninstall ⛔",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Stop);
+            
+            if (finalProtectedResult != MessageBoxResult.Yes)
+                return;
         }
         
-        var result = MessageBox.Show(
-            $"Are you sure you want to uninstall '{_selectedPackage.DisplayName}'?\n\nThis cannot be undone.",
-            "Confirm Uninstall", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        
-        if (result != MessageBoxResult.Yes) return;
+        // Enhanced warning for critical system apps
+        if (_selectedPackage.IsCriticalSystemApp)
+        {
+            var criticalWarningResult = MessageBox.Show(
+                $"⚠️ CRITICAL WARNING ⚠️\n\n" +
+                $"'{_selectedPackage.DisplayName}' is a CRITICAL SYSTEM APP.\n\n" +
+                $"Uninstalling this app may:\n" +
+                $"• Prevent Windows from starting properly\n" +
+                $"• Cause the Start Menu to stop working\n" +
+                $"• Break essential Windows functionality\n" +
+                $"• Require a complete Windows reset to fix\n\n" +
+                $"Are you ABSOLUTELY SURE you want to proceed?\n\n" +
+                $"This action is EXTREMELY DANGEROUS and CANNOT be undone!",
+                "⚠️ CRITICAL SYSTEM APP - DANGER ⚠️",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Stop);
+            
+            if (criticalWarningResult != MessageBoxResult.Yes)
+                return;
+            
+            // Second confirmation - make it very clear
+            var secondWarningResult = MessageBox.Show(
+                $"⛔ FINAL WARNING ⛔\n\n" +
+                $"You are about to uninstall:\n" +
+                $"'{_selectedPackage.DisplayName}'\n\n" +
+                $"This is a CRITICAL SYSTEM COMPONENT.\n\n" +
+                $"If Windows becomes unusable after this, you may need to:\n" +
+                $"• Boot into Safe Mode\n" +
+                $"• Use System Restore\n" +
+                $"• Perform a complete Windows Reset\n\n" +
+                $"Are you 100% certain you want to continue?\n\n" +
+                $"Click NO to cancel (RECOMMENDED).",
+                "⛔ FINAL CONFIRMATION ⛔",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Stop);
+            
+            if (secondWarningResult != MessageBoxResult.Yes)
+                return;
+        }
+        else
+        {
+            // Regular confirmation for non-critical apps
+            var result = MessageBox.Show(
+                $"Are you sure you want to uninstall '{_selectedPackage.DisplayName}'?\n\nThis cannot be undone.",
+                "Confirm Uninstall", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            
+            if (result != MessageBoxResult.Yes) return;
+        }
         
         try
         {
@@ -210,6 +291,35 @@ public partial class PackageListView : UserControl
         {
             MainVm?.Diagnostics?.Log(LogLevel.Error, ex.Message);
             MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+    
+    private async void ShowCriticalApps_Checked(object sender, RoutedEventArgs e)
+    {
+        // Show warning dialog when enabling critical apps view
+        var result = MessageBox.Show(
+            "⚠️ WARNING: You are about to show critical system apps.\n\n" +
+            "These apps include:\n" +
+            "• Start Menu\n" +
+            "• Windows Settings\n" +
+            "• Shell Experience (Taskbar)\n" +
+            "• Microsoft Store\n" +
+            "• Windows Security\n" +
+            "• And other essential Windows components\n\n" +
+            "Uninstalling ANY of these apps can cause SERIOUS SYSTEM PROBLEMS that may require a complete Windows reset to fix.\n\n" +
+            "Do you understand the risks and want to proceed?",
+            "⚠️ Critical Apps Warning",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        
+        if (result == MessageBoxResult.Yes)
+        {
+            await LoadPackages();
+        }
+        else
+        {
+            // Uncheck the checkbox if user cancels
+            ShowCriticalApps.IsChecked = false;
         }
     }
     

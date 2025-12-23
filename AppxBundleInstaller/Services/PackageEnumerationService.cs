@@ -91,6 +91,7 @@ public class PackageEnumerationService
                 InstallDate = TryGetInstallDate(package),
                 IsFramework = package.IsFramework,
                 IsSystemProtected = IsSystemProtectedPackage(package),
+                IsCriticalSystemApp = IsCriticalSystemApp(package),
                 SignatureStatus = ConvertSignatureKind(package.SignatureKind),
                 Scope = package.InstalledLocation != null ? PackageScope.User : PackageScope.Machine,
                 LogoPath = TryGetLogoPath(package)
@@ -204,7 +205,80 @@ public class PackageEnumerationService
         if (!filter.IncludeFrameworks && package.IsFramework)
             return false;
         
+        // Critical apps filter - hide by default for safety
+        if (!filter.IncludeCriticalApps && package.IsCriticalSystemApp)
+            return false;
+        
         return true;
+    }
+    
+    /// <summary>
+    /// List of package name patterns for critical system apps that could break Windows if uninstalled
+    /// </summary>
+    private static readonly string[] CriticalSystemAppPatterns = new[]
+    {
+        "Microsoft.Windows.StartMenuExperienceHost",   // Start Menu
+        "Microsoft.Windows.ShellExperienceHost",       // Shell/Taskbar
+        "windows.immersivecontrolpanel",               // Settings app
+        "Microsoft.Windows.Search",                    // Windows Search
+        "Microsoft.WindowsStore",                      // Microsoft Store
+        "Microsoft.Windows.Cortana",                   // Cortana
+        "Microsoft.AAD.BrokerPlugin",                  // Azure AD authentication
+        "Microsoft.Windows.CloudExperienceHost",      // OOBE/First-run experience
+        "Microsoft.Windows.ContentDeliveryManager",   // Content delivery
+        "Microsoft.Windows.SecHealthUI",              // Windows Security
+        "Microsoft.SecHealthUI",                       // Windows Security (alternate)
+        "Microsoft.Windows.XGpuEjectDialog",          // GPU eject
+        "Microsoft.Windows.PeopleExperienceHost",     // People bar
+        "Microsoft.Windows.ParentalControls",         // Parental controls
+        "Microsoft.LockApp",                           // Lock screen
+        "Microsoft.Windows.AssignedAccessLockApp",    // Kiosk mode
+        "Microsoft.Windows.NarratorQuickStart",       // Accessibility
+        "Microsoft.Windows.OOBENetworkCaptivePortal", // Network captive portal
+        "Microsoft.Windows.OOBENetworkConnectionFlow", // Network setup
+        "Microsoft.Windows.PinningConfirmationDialog", // Pin confirmation
+        "Microsoft.Windows.SecureAssessmentBrowser",  // Secure browser for tests
+        "Microsoft.XboxGameCallableUI",               // Xbox integration
+        "Microsoft.XboxIdentityProvider",             // Xbox identity
+        "Microsoft.AccountsControl",                   // Account management
+        "Microsoft.CredDialogHost",                    // Credential dialog
+        "Microsoft.ECApp",                             // Eye control
+        "Microsoft.BioEnrollment",                     // Biometric enrollment
+        "Windows.PrintDialog",                         // Print dialog
+        "Windows.CBSPreview",                          // CBS Preview
+        "NcsiUwpApp",                                  // Network connectivity status
+        "1527c705-839a-4832-9118-54d4Bd6a0c89",       // File Picker
+        "c5e2524a-ea46-4f67-841f-6a9465d9d515",       // File Explorer AddSuggestedFoldersToLibrary
+        "E2A4F912-2574-4A75-9BB0-0D023378592B",       // App Resolver UX
+        "F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE"        // Add Suggested Folders To Library
+    };
+    
+    /// <summary>
+    /// Determines if a package is a critical system app
+    /// </summary>
+    private bool IsCriticalSystemApp(Windows.ApplicationModel.Package package)
+    {
+        try
+        {
+            var packageName = package.Id.Name;
+            var familyName = package.Id.FamilyName;
+            
+            // Check if the package matches any critical app pattern
+            foreach (var pattern in CriticalSystemAppPatterns)
+            {
+                if (packageName.Contains(pattern, StringComparison.OrdinalIgnoreCase) ||
+                    familyName.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
 
@@ -215,6 +289,11 @@ public class PackageFilter
 {
     public PublisherType PublisherType { get; set; } = PublisherType.All;
     public bool IncludeFrameworks { get; set; } = false;
+    /// <summary>
+    /// Whether to include critical system apps (Start, Settings, Shell, etc.)
+    /// Default is false for safety - these apps can break Windows if uninstalled
+    /// </summary>
+    public bool IncludeCriticalApps { get; set; } = false;
 }
 
 public enum PublisherType

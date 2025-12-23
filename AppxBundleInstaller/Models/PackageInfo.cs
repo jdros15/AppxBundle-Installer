@@ -34,6 +34,12 @@ public class PackageInfo
     public bool IsSystemProtected { get; set; }
     
     /// <summary>
+    /// Whether this is a critical system app that if uninstalled could break Windows
+    /// (e.g., Start Menu, Settings, Shell Experience, etc.)
+    /// </summary>
+    public bool IsCriticalSystemApp { get; set; }
+    
+    /// <summary>
     /// Digital signature status
     /// </summary>
     public SignatureStatus SignatureStatus { get; set; } = SignatureStatus.Unknown;
