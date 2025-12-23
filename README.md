@@ -90,7 +90,6 @@ To create a standalone executabe that is **optimized for size** (avoiding the 25
 
 This command enables **Single File** publishing and **Compression**, which drastically reduces the final `.exe` size (typically ~60-80MB for a fully self-contained app).
 
-```powershell
 # Publish optimized standalone executable
 dotnet publish AppxBundleInstaller/AppxBundleInstaller.csproj `
     -c Release `
@@ -98,8 +97,8 @@ dotnet publish AppxBundleInstaller/AppxBundleInstaller.csproj `
     --self-contained true `
     -p:PublishSingleFile=true `
     -p:EnableCompressionInSingleFile=true `
-    -p:DebugType=embedded
-```
+    -p:DebugType=embedded `
+    -p:IncludeNativeLibrariesForSelfExtract=true
 
 **Output Location**:  
 `AppxBundleInstaller/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/`

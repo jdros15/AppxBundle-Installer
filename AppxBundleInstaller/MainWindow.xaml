@@ -89,15 +89,7 @@
                 </StackPanel>
                 
                 <!-- Version at bottom -->
-                <StackPanel Grid.Row="2" Margin="12,0,12,20">
-                    <Rectangle Height="1" Fill="{DynamicResource SystemControlForegroundBaseLowBrush}" Margin="8,0,8,12" />
-                    
-                    <!-- Version -->
-                    <TextBlock Text="Version 1.0.0" 
-                               FontSize="11"
-                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                               HorizontalAlignment="Center" />
-                </StackPanel>
+
             </Grid>
         </Border>
         

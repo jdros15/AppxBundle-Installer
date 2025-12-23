@@ -152,7 +152,11 @@
                                 <TextBlock Text="A modern package manager for Windows" 
                                            FontSize="12"
                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                           Margin="0,8,0,0" />
+                                    Margin="0,8,0,0" />
+                                <TextBlock Text="JD Ros" 
+                                           FontSize="12"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                           Margin="0,2,0,0" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>
