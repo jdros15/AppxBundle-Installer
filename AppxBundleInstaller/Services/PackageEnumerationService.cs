@@ -84,10 +84,11 @@ public class PackageEnumerationService
                 PublisherDisplayName = GetPublisherDisplayName(package),
                 PublisherId = package.Id.PublisherId,
                 Version = $"{package.Id.Version.Major}.{package.Id.Version.Minor}.{package.Id.Version.Build}.{package.Id.Version.Revision}",
-                Architecture = package.Id.Architecture.ToString(),
+                Architecture = GetFriendlyArchitecture(package.Id.Architecture),
                 PackageFamilyName = package.Id.FamilyName,
                 PackageFullName = package.Id.FullName,
                 InstallLocation = TryGetInstallLocation(package),
+                InstallDate = TryGetInstallDate(package),
                 IsFramework = package.IsFramework,
                 IsSystemProtected = IsSystemProtectedPackage(package),
                 SignatureStatus = ConvertSignatureKind(package.SignatureKind),
@@ -104,15 +105,44 @@ public class PackageEnumerationService
                 DisplayName = package.Id.Name,
                 PackageFamilyName = package.Id.FamilyName,
                 PackageFullName = package.Id.FullName,
-                Version = "Unknown"
+                Version = "Unknown",
+                Architecture = "Unknown"
             };
         }
     }
     
     private string GetDisplayName(Windows.ApplicationModel.Package package)
     {
-        try { return package.DisplayName; }
+        try 
+        { 
+            var displayName = package.DisplayName;
+            // If DisplayName is empty or whitespace, fall back to the package Name
+            return string.IsNullOrWhiteSpace(displayName) ? package.Id.Name : displayName; 
+        }
         catch { return package.Id.Name; }
+    }
+    
+    private string GetFriendlyArchitecture(Windows.System.ProcessorArchitecture arch)
+    {
+        return arch switch
+        {
+            Windows.System.ProcessorArchitecture.X86 => "X86",
+            Windows.System.ProcessorArchitecture.X64 => "X64",
+            Windows.System.ProcessorArchitecture.Arm => "ARM",
+            Windows.System.ProcessorArchitecture.Arm64 => "ARM64",
+            Windows.System.ProcessorArchitecture.Neutral => "Any",  // More user-friendly than "Neutral"
+            Windows.System.ProcessorArchitecture.Unknown => "Unknown",
+            _ => arch.ToString()
+        };
+    }
+    
+    private DateTime? TryGetInstallDate(Windows.ApplicationModel.Package package)
+    {
+        try 
+        { 
+            return package.InstalledDate.DateTime;
+        }
+        catch { return null; }
     }
     
     private string GetPublisherDisplayName(Windows.ApplicationModel.Package package)

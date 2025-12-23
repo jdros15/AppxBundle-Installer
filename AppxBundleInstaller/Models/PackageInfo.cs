@@ -15,6 +15,7 @@ public class PackageInfo
     public string PackageFullName { get; set; } = string.Empty;
     public string InstallLocation { get; set; } = string.Empty;
     public string? LogoPath { get; set; }
+    public DateTime? InstallDate { get; set; }
     
     /// <summary>
     /// Whether this is a Microsoft-published package

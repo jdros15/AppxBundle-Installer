@@ -34,6 +34,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 
                 <TextBox x:Name="SearchBox" 
@@ -42,8 +43,22 @@
                          Padding="8"
                          FontSize="14" />
                 
-                <ComboBox x:Name="PublisherFilter" 
+                <ComboBox x:Name="SortOrder" 
                           Grid.Column="1"
+                          SelectedIndex="0"
+                          SelectionChanged="SortOrder_SelectionChanged"
+                          MinWidth="150"
+                          Margin="12,0,0,0">
+                    <ComboBoxItem Content="Name (A-Z)" />
+                    <ComboBoxItem Content="Name (Z-A)" />
+                    <ComboBoxItem Content="Recently Installed" />
+                    <ComboBoxItem Content="Oldest First" />
+                    <ComboBoxItem Content="Publisher" />
+                    <ComboBoxItem Content="Version" />
+                </ComboBox>
+                
+                <ComboBox x:Name="PublisherFilter" 
+                          Grid.Column="2"
                           SelectedIndex="0"
                           SelectionChanged="PublisherFilter_SelectionChanged"
                           MinWidth="120"
@@ -54,7 +69,7 @@
                 </ComboBox>
                 
                 <CheckBox x:Name="ShowFrameworks"
-                          Grid.Column="2"
+                          Grid.Column="3"
                           Content="Frameworks"
                           Checked="Filter_Changed"
                           Unchecked="Filter_Changed"
@@ -86,8 +101,8 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="44" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="120" />
-                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="60" />
                         </Grid.ColumnDefinitions>
                         
                         <!-- Icon -->
@@ -100,7 +115,7 @@
                         </Border>
                         
                         <!-- Name & Publisher -->
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,16,0">
                             <TextBlock Text="{Binding DisplayName}" 
                                        FontWeight="SemiBold"
                                        TextTrimming="CharacterEllipsis"
@@ -115,12 +130,15 @@
                         <TextBlock Grid.Column="2" 
                                    Text="{Binding Version}"
                                    VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,0,16,0"
                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                         
                         <!-- Arch -->
                         <TextBlock Grid.Column="3"
                                    Text="{Binding Architecture}"
                                    VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                     </Grid>
                 </DataTemplate>

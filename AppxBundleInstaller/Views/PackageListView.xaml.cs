@@ -69,8 +69,33 @@ public partial class PackageListView : UserControl
                 p.PublisherDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                 p.PackageFamilyName.Contains(search, StringComparison.OrdinalIgnoreCase));
         
-        PackageList.ItemsSource = filtered.ToList();
+        // Apply sorting
+        var sorted = ApplySorting(filtered);
+        
+        PackageList.ItemsSource = sorted.ToList();
         StatusText.Text = $"{PackageList.Items.Count} packages";
+    }
+    
+    private IEnumerable<PackageInfo> ApplySorting(IEnumerable<PackageInfo> packages)
+    {
+        var sortIndex = SortOrder?.SelectedIndex ?? 0;
+        
+        return sortIndex switch
+        {
+            0 => packages.OrderBy(p => p.DisplayName),                                    // Name (A-Z)
+            1 => packages.OrderByDescending(p => p.DisplayName),                          // Name (Z-A)
+            2 => packages.OrderByDescending(p => p.InstallDate ?? DateTime.MinValue),     // Recently Installed
+            3 => packages.OrderBy(p => p.InstallDate ?? DateTime.MaxValue),               // Oldest First
+            4 => packages.OrderBy(p => p.PublisherDisplayName).ThenBy(p => p.DisplayName), // Publisher
+            5 => packages.OrderByDescending(p => p.Version),                              // Version
+            _ => packages.OrderBy(p => p.DisplayName)
+        };
+    }
+    
+    private void SortOrder_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (IsLoaded)
+            ApplySearch();
     }
     
     private PublisherType GetSelectedPublisherType()
