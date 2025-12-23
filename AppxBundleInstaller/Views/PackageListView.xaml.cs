@@ -30,6 +30,10 @@ public partial class PackageListView : UserControl
             MainVm.PropertyChanged += MainVm_PropertyChanged;
             MainVm.PackagesChanged += MainVm_PackagesChanged;
         }
+        
+        // Initialize sort order from settings
+        SortOrder.SelectedIndex = (int)SettingsService.Instance.SortOption;
+        
         await LoadPackages();
     }
     
@@ -118,7 +122,14 @@ public partial class PackageListView : UserControl
     private void SortOrder_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (IsLoaded)
+        {
+            // Update setting when sort order changes
+            if (SortOrder.SelectedIndex >= 0)
+            {
+                SettingsService.Instance.SortOption = (PackageSortOption)SortOrder.SelectedIndex;
+            }
             ApplySearch();
+        }
     }
     
     private PublisherType GetSelectedPublisherType()

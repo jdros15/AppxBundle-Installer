@@ -32,6 +32,9 @@ public partial class PackageListViewModel : ObservableObject
     private bool _includeFrameworks = false;
     
     [ObservableProperty]
+    private PackageSortOption _sortOption;
+    
+    [ObservableProperty]
     private bool _isLoading;
     
     [ObservableProperty]
@@ -54,6 +57,9 @@ public partial class PackageListViewModel : ObservableObject
         _enumeration = enumeration;
         _packageManager = packageManager;
         _diagnostics = diagnostics;
+        
+        // Initialize sort option from settings
+        _sortOption = SettingsService.Instance.SortOption;
     }
     
     [RelayCommand]
@@ -71,8 +77,8 @@ public partial class PackageListViewModel : ObservableObject
             };
             
             var packages = string.IsNullOrWhiteSpace(SearchText)
-                ? await _enumeration.GetInstalledPackagesAsync(filter)
-                : await _enumeration.SearchPackagesAsync(SearchText, filter);
+                ? await _enumeration.GetInstalledPackagesAsync(filter, SortOption)
+                : await _enumeration.SearchPackagesAsync(SearchText, filter, SortOption);
             
             Packages.Clear();
             foreach (var pkg in packages)
@@ -106,6 +112,12 @@ public partial class PackageListViewModel : ObservableObject
     
     partial void OnIncludeFrameworksChanged(bool value)
     {
+        _ = LoadPackages();
+    }
+    
+    partial void OnSortOptionChanged(PackageSortOption value)
+    {
+        SettingsService.Instance.SortOption = value;
         _ = LoadPackages();
     }
     

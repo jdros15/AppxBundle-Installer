@@ -91,3 +91,14 @@ public enum PackageScope
     User,
     Machine
 }
+
+public enum PackageSortOption
+{
+    DisplayNameAsc = 0,
+    DisplayNameDesc = 1,
+    InstallDateNewest = 2,
+    InstallDateOldest = 3,
+    Publisher = 4,
+
+    Version = 5
+}

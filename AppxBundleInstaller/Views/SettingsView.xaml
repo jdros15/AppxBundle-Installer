@@ -211,7 +211,13 @@
                                 <TextBlock Text="by JD Ros" 
                                            FontSize="12"
                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                           Margin="0,2,0,0" />
+                                    Margin="0,2,0,0" />
+                                
+                                <TextBlock Margin="0,8,0,0">
+                                    <Hyperlink NavigateUri="https://github.com/jdros15/AppxBundle-Installer" RequestNavigate="Hyperlink_RequestNavigate">
+                                        View on GitHub
+                                    </Hyperlink>
+                                </TextBlock>
                             </StackPanel>
                         </Grid>
                     </StackPanel>

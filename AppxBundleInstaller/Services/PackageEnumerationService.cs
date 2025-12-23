@@ -18,26 +18,35 @@ public class PackageEnumerationService
     /// <summary>
     /// Gets all packages installed for the current user
     /// </summary>
-    public async Task<IEnumerable<PackageInfo>> GetInstalledPackagesAsync(PackageFilter? filter = null)
+    public async Task<IEnumerable<PackageInfo>> GetInstalledPackagesAsync(PackageFilter? filter = null, PackageSortOption sortOption = PackageSortOption.DisplayNameAsc)
     {
         return await Task.Run(() =>
         {
             var packages = _packageManager.FindPackagesForUser(string.Empty);
             
-            return packages
+            var query = packages
                 .Select(ConvertToPackageInfo)
-                .Where(p => MatchesFilter(p, filter ?? new PackageFilter()))
-                .OrderBy(p => p.DisplayName)
-                .ToList();
+                .Where(p => MatchesFilter(p, filter ?? new PackageFilter()));
+                
+            return sortOption switch
+            {
+                PackageSortOption.DisplayNameAsc => query.OrderBy(p => p.DisplayName).ToList(),
+                PackageSortOption.DisplayNameDesc => query.OrderByDescending(p => p.DisplayName).ToList(),
+                PackageSortOption.InstallDateNewest => query.OrderByDescending(p => p.InstallDate ?? DateTime.MinValue).ToList(),
+                PackageSortOption.InstallDateOldest => query.OrderBy(p => p.InstallDate ?? DateTime.MaxValue).ToList(),
+                PackageSortOption.Publisher => query.OrderBy(p => p.PublisherDisplayName).ThenBy(p => p.DisplayName).ToList(),
+                PackageSortOption.Version => query.OrderByDescending(p => p.Version).ToList(),
+                _ => query.OrderBy(p => p.DisplayName).ToList()
+            };
         });
     }
     
     /// <summary>
     /// Searches packages by name, family name, or publisher
     /// </summary>
-    public async Task<IEnumerable<PackageInfo>> SearchPackagesAsync(string searchTerm, PackageFilter? filter = null)
+    public async Task<IEnumerable<PackageInfo>> SearchPackagesAsync(string searchTerm, PackageFilter? filter = null, PackageSortOption sortOption = PackageSortOption.DisplayNameAsc)
     {
-        var packages = await GetInstalledPackagesAsync(filter);
+        var packages = await GetInstalledPackagesAsync(filter, sortOption);
         
         if (string.IsNullOrWhiteSpace(searchTerm))
         {

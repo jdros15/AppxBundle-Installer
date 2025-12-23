@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
+using AppxBundleInstaller.Models;
 
 namespace AppxBundleInstaller.Services;
 
@@ -15,7 +16,10 @@ public partial class SettingsService : ObservableObject
     private string _downloadFolderPath;
 
     [ObservableProperty]
-    private bool _autoInstall;
+    private bool _autoInstall = true;
+
+    [ObservableProperty]
+    private PackageSortOption _sortOption = PackageSortOption.InstallDateNewest;
 
     [ObservableProperty]
     private bool _isDarkMode;
@@ -53,10 +57,11 @@ public partial class SettingsService : ObservableObject
                 if (settings != null)
                 {
                     DownloadFolderPath = settings.DownloadFolderPath ?? _downloadFolderPath;
-                    AutoInstall = settings.AutoInstall;
+                    AutoInstall = settings.AutoInstall ?? true;
                     IsDarkMode = settings.IsDarkMode;
                     ShowAppIcons = settings.ShowAppIcons;
                     ShowCriticalApps = settings.ShowCriticalApps;
+                    SortOption = settings.SortOption ?? PackageSortOption.InstallDateNewest;
                     IsLoaded = true;
                 }
             }
@@ -74,7 +79,8 @@ public partial class SettingsService : ObservableObject
                 AutoInstall = AutoInstall,
                 IsDarkMode = IsDarkMode,
                 ShowAppIcons = ShowAppIcons,
-                ShowCriticalApps = ShowCriticalApps
+                ShowCriticalApps = ShowCriticalApps,
+                SortOption = SortOption
             };
             var json = JsonSerializer.Serialize(settings);
             File.WriteAllText(_settingsPath, json);
@@ -84,6 +90,7 @@ public partial class SettingsService : ObservableObject
 
     partial void OnDownloadFolderPathChanged(string value) => SaveSettings();
     partial void OnAutoInstallChanged(bool value) => SaveSettings();
+    partial void OnSortOptionChanged(PackageSortOption value) => SaveSettings();
     partial void OnIsDarkModeChanged(bool value) => SaveSettings();
     partial void OnShowAppIconsChanged(bool value) => SaveSettings();
     partial void OnShowCriticalAppsChanged(bool value) => SaveSettings();
@@ -91,9 +98,10 @@ public partial class SettingsService : ObservableObject
     private class SettingsData
     {
         public string? DownloadFolderPath { get; set; }
-        public bool AutoInstall { get; set; }
+        public bool? AutoInstall { get; set; }
         public bool IsDarkMode { get; set; }
         public bool ShowAppIcons { get; set; }
         public bool ShowCriticalApps { get; set; }
+        public PackageSortOption? SortOption { get; set; }
     }
 }

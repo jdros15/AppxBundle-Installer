@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Diagnostics;
+using System.Windows.Navigation;
 using AppxBundleInstaller.ViewModels;
 
 namespace AppxBundleInstaller.Views;
@@ -44,5 +46,14 @@ public partial class SettingsView : UserControl
                 CriticalAppsToggle.Toggled += CriticalAppsToggle_Toggled;
             }
         }
+    }
+    private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            e.Handled = true;
+        }
+        catch { /* Ignore navigation errors */ }
     }
 }
